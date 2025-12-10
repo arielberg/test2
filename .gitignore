@@ -1,5 +1,32 @@
-keys
-playground/
+# Dependencies
+node_modules/
 package-lock.json
 package.json
-node_modules/
+
+# Keys and secrets
+keys/
+*.key
+*.pem
+
+# Development
+playground/
+localServer/
+
+# OS files
+.DS_Store
+*.log
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Note: cms-core/ is a submodule, don't ignore it

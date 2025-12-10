@@ -1,0 +1,3 @@
+[submodule "cms-core"]
+	path = cms-core
+	url = git@github.com:arielberg/js.cms.git
