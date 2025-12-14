@@ -120,7 +120,7 @@
                 // Also check if we're already in the admin area
                 if (currentPath.includes('/cms-core/') || currentPath.endsWith('/cms-core')) {
                     // If already at admin/index.html, don't redirect
-                    if (currentPath.includes('/cms-core/admin/index.html')) {
+                    if (currentPath.includes('/cms-core/index.html')) {
                         console.log('Already at admin panel');
                         return;
                     }
@@ -129,7 +129,7 @@
                     // Extract base path (everything before /cms-core)
                     const adminBasePath = currentPath.split('/cms-core')[0] || '';
                     // Construct admin path
-                    const adminPath = adminBasePath + '/cms-core/admin/index.html';
+                    const adminPath = adminBasePath + '/cms-core/index.html';
                     console.log('Redirecting to:', adminPath);
                     window.location.replace(adminPath);
                     return;
@@ -164,7 +164,7 @@
                             <p style="color: #666; font-size: 12px;">${error.message || 'Unknown error'}</p>
                             <p style="color: #666; font-size: 11px; margin-top: 10px;">Check browser console (F12) for more details.</p>
                             <div style="margin-top: 30px;">
-                                <a href="cms-core/admin/index.html" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px;">Go to Admin Panel</a>
+                                <a href="cms-core/index.html" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px;">Go to Admin Panel</a>
                             </div>
                         </div>
                     `;
@@ -182,7 +182,7 @@
                         <p style="color: #666; font-size: 12px;">${error.message || 'Unknown error'}</p>
                         <div style="margin-top: 30px;">
                             <a href="cms-core/init/index.html" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">Setup Wizard</a>
-                            <a href="cms-core/admin/index.html" style="display: inline-block; padding: 10px 20px; background: #48bb78; color: white; text-decoration: none; border-radius: 4px;">Admin Panel</a>
+                            <a href="cms-core/index.html" style="display: inline-block; padding: 10px 20px; background: #48bb78; color: white; text-decoration: none; border-radius: 4px;">Admin Panel</a>
                         </div>
                     </div>
                 `;
