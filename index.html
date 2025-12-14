@@ -129,9 +129,24 @@
                     }
                 }
                 
-                // If configured but no token, still allow access to admin (user can log in there)
-                console.log('Configured but no token - redirecting to admin panel (user can log in)');
-                window.location.replace('cms-core/admin/index.html');
+                // Check if URL contains cms-core path - if so, go to admin
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('/cms-core/')) {
+                    console.log('URL contains cms-core path - redirecting to admin panel');
+                    window.location.replace('cms-core/admin/index.html');
+                    return;
+                }
+                
+                // Site is configured - show homepage (frontend)
+                console.log('Site configured - showing homepage');
+                // Import and initialize frontend router
+                import('./cms-core/frontend/router.mjs').then(module => {
+                    module.initFrontend();
+                }).catch(error => {
+                    console.error('Failed to load frontend router:', error);
+                    // Fallback to admin if frontend fails
+                    window.location.replace('cms-core/admin/index.html');
+                });
                 
             } catch (error) {
                 console.error('Error checking configuration:', error);
