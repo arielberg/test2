@@ -112,29 +112,67 @@
                 }
                 
                 // Check if URL contains cms-core path - if so, go to admin
+                // Handle both root paths and GitHub Pages paths (e.g., /test2/cms-core/)
                 const currentPath = window.location.pathname;
-                if (currentPath.includes('/cms-core/')) {
+                const currentUrl = window.location.href;
+                
+                // Check if path contains /cms-core/ or ends with /cms-core
+                // Also check if we're already in the admin area
+                if (currentPath.includes('/cms-core/') || currentPath.endsWith('/cms-core')) {
+                    // If already at admin/index.html, don't redirect
+                    if (currentPath.includes('/cms-core/admin/index.html')) {
+                        console.log('Already at admin panel');
+                        return;
+                    }
+                    
                     console.log('URL contains cms-core path - redirecting to admin panel');
-                    window.location.replace('cms-core/admin/index.html');
+                    // Extract base path (everything before /cms-core)
+                    const basePath = currentPath.split('/cms-core')[0] || '';
+                    // Construct admin path
+                    const adminPath = basePath + '/cms-core/admin/index.html';
+                    console.log('Redirecting to:', adminPath);
+                    window.location.replace(adminPath);
                     return;
                 }
                 
                 // Site is configured - show homepage (frontend)
                 console.log('Site configured - showing homepage');
                 // Import and initialize frontend router
-                import('./cms-core/frontend/router.mjs').then(module => {
-                    module.initFrontend();
-                }).catch(error => {
+                try {
+                    const routerModule = await import('./cms-core/frontend/router.mjs');
+                    await routerModule.initFrontend();
+                } catch (error) {
                     console.error('Failed to load frontend router:', error);
-                    // Fallback to admin if frontend fails
-                    window.location.replace('cms-core/admin/index.html');
-                });
+                    console.error('Error details:', error.message, error.stack);
+                    // Show error message instead of redirecting
+                    document.body.innerHTML = `
+                        <div class="loading-container">
+                            <h2 style="color: #d32f2f;">Error Loading Site</h2>
+                            <p style="color: #666; margin: 20px 0;">Failed to initialize the frontend router.</p>
+                            <p style="color: #666; font-size: 12px;">${error.message || 'Unknown error'}</p>
+                            <div style="margin-top: 30px;">
+                                <a href="cms-core/admin/index.html" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px;">Go to Admin Panel</a>
+                            </div>
+                        </div>
+                    `;
+                }
                 
             } catch (error) {
                 console.error('Error checking configuration:', error);
                 console.error('Error details:', error.message, error.stack);
-                // On error, redirect to setup wizard
-                window.location.replace('cms-core/init/index.html');
+                
+                // Show error message with options
+                document.body.innerHTML = `
+                    <div class="loading-container">
+                        <h2 style="color: #d32f2f;">Configuration Error</h2>
+                        <p style="color: #666; margin: 20px 0;">An error occurred while checking site configuration.</p>
+                        <p style="color: #666; font-size: 12px;">${error.message || 'Unknown error'}</p>
+                        <div style="margin-top: 30px;">
+                            <a href="cms-core/init/index.html" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">Setup Wizard</a>
+                            <a href="cms-core/admin/index.html" style="display: inline-block; padding: 10px 20px; background: #48bb78; color: white; text-decoration: none; border-radius: 4px;">Admin Panel</a>
+                        </div>
+                    </div>
+                `;
             }
         }
 
