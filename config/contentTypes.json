@@ -1,13 +1,13 @@
 [
     {
-        "name": "post",
-        "label": "BLoc",
-        "labelPlural": "bvdf",
-        "urlPrefix": "Posts/",
+        "name": "sfsdf",
+        "label": "fgdsfg",
+        "labelPlural": "cdgef",
+        "urlPrefix": "fgsgf/",
         "fields": [
             {
-                "name": "adfdsf",
-                "label": "sdfsdf",
+                "name": "sfdsdf",
+                "label": "sdfsdfsd",
                 "type": "textfield",
                 "i18n": true
             }
