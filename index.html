@@ -139,7 +139,19 @@
                 console.log('Site configured - showing homepage');
                 // Import and initialize frontend router
                 try {
-                    const routerModule = await import('./cms-core/frontend/router.mjs');
+                    // Handle GitHub Pages path for module import
+                    let routerPath = './cms-core/frontend/router.mjs';
+                    const githubPagesMatch = window.location.href.match(/github\.io\/([^/]+)/);
+                    if (githubPagesMatch) {
+                        const repoName = githubPagesMatch[1];
+                        const currentPath = window.location.pathname;
+                        if (currentPath.startsWith(`/${repoName}/`)) {
+                            routerPath = `/${repoName}/cms-core/frontend/router.mjs`;
+                        }
+                    }
+                    
+                    console.log('Loading router from:', routerPath);
+                    const routerModule = await import(routerPath);
                     await routerModule.initFrontend();
                 } catch (error) {
                     console.error('Failed to load frontend router:', error);
@@ -150,6 +162,7 @@
                             <h2 style="color: #d32f2f;">Error Loading Site</h2>
                             <p style="color: #666; margin: 20px 0;">Failed to initialize the frontend router.</p>
                             <p style="color: #666; font-size: 12px;">${error.message || 'Unknown error'}</p>
+                            <p style="color: #666; font-size: 11px; margin-top: 10px;">Check browser console (F12) for more details.</p>
                             <div style="margin-top: 30px;">
                                 <a href="cms-core/admin/index.html" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px;">Go to Admin Panel</a>
                             </div>
