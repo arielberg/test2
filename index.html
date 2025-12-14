@@ -152,7 +152,9 @@
                     
                     console.log('Loading router from:', routerPath);
                     const routerModule = await import(routerPath);
+                    console.log('Router module loaded, initializing frontend...');
                     await routerModule.initFrontend();
+                    console.log('Frontend initialized successfully');
                 } catch (error) {
                     console.error('Failed to load frontend router:', error);
                     console.error('Error details:', error.message, error.stack);
