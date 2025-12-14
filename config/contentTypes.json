@@ -1,1 +1,16 @@
-[]
+[
+    {
+        "name": "post",
+        "label": "BLoc",
+        "labelPlural": "bvdf",
+        "urlPrefix": "Posts/",
+        "fields": [
+            {
+                "name": "adfdsf",
+                "label": "sdfsdf",
+                "type": "textfield",
+                "i18n": true
+            }
+        ]
+    }
+]
