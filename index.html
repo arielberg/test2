@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Loading...</title>
     <style>
         body {
@@ -50,19 +53,26 @@
         async function checkAndRedirect() {
             try {
                 console.log('Checking configuration...');
+                console.log('Current URL:', window.location.href);
                 
                 // Check site config first (takes precedence), then fall back to cms-core defaults
-                let response = await fetch('config/appSettings.json');
+                // Add cache-busting parameter to ensure fresh fetch
+                const cacheBuster = '?t=' + Date.now();
+                let response = await fetch('config/appSettings.json' + cacheBuster);
+                console.log('First fetch attempt:', response.status, response.statusText);
+                
                 if (!response.ok) {
                     console.log('Site config not found, trying cms-core defaults...');
                     // Fall back to cms-core defaults
-                    response = await fetch('cms-core/config/appSettings.json');
+                    response = await fetch('cms-core/config/appSettings.json' + cacheBuster);
+                    console.log('Second fetch attempt:', response.status, response.statusText);
                 }
                 
                 if (!response.ok) {
                     console.log('No appSettings.json found - redirecting to setup wizard');
+                    console.log('Response status:', response.status, response.statusText);
                     // Not configured - redirect to setup wizard
-                    window.location.href = 'cms-core/init/index.html';
+                    window.location.replace('cms-core/init/index.html');
                     return;
                 }
                 
@@ -79,11 +89,25 @@
                     appSettings.GIT_Repository !== '';
                 
                 console.log('hasValidAccount:', hasValidAccount, 'hasValidRepo:', hasValidRepo);
+                console.log('GIT_Account value:', appSettings.GIT_Account);
+                console.log('GIT_Repository value:', appSettings.GIT_Repository);
                 
                 if (!hasValidAccount || !hasValidRepo) {
                     console.log('Invalid account or repository - redirecting to setup wizard');
+                    console.log('Account check:', {
+                        exists: !!appSettings.GIT_Account,
+                        value: appSettings.GIT_Account,
+                        isPlaceholder: appSettings.GIT_Account === 'your-username',
+                        isEmpty: appSettings.GIT_Account === ''
+                    });
+                    console.log('Repo check:', {
+                        exists: !!appSettings.GIT_Repository,
+                        value: appSettings.GIT_Repository,
+                        isPlaceholder: appSettings.GIT_Repository === 'your-repo-name',
+                        isEmpty: appSettings.GIT_Repository === ''
+                    });
                     // Not configured - redirect to setup wizard
-                    window.location.href = 'cms-core/init/index.html';
+                    window.location.replace('cms-core/init/index.html');
                     return;
                 }
                 
@@ -97,7 +121,7 @@
                         if (secretData.token && secretData.token !== '') {
                             console.log('Token found - redirecting to admin panel');
                             // Site is configured with token - redirect to admin panel
-                            window.location.href = 'cms-core/admin/index.html';
+                            window.location.replace('cms-core/admin/index.html');
                             return;
                         }
                     } catch (e) {
@@ -107,12 +131,13 @@
                 
                 // If configured but no token, still allow access to admin (user can log in there)
                 console.log('Configured but no token - redirecting to admin panel (user can log in)');
-                window.location.href = 'cms-core/admin/index.html';
+                window.location.replace('cms-core/admin/index.html');
                 
             } catch (error) {
                 console.error('Error checking configuration:', error);
+                console.error('Error details:', error.message, error.stack);
                 // On error, redirect to setup wizard
-                window.location.href = 'cms-core/init/index.html';
+                window.location.replace('cms-core/init/index.html');
             }
         }
 
