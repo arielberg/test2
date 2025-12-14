@@ -111,24 +111,6 @@
                     return;
                 }
                 
-                // Check if token exists in localStorage (optional - user can log in later)
-                const secret = localStorage.getItem('secret');
-                console.log('Secret exists:', !!secret);
-                
-                if (secret) {
-                    try {
-                        const secretData = JSON.parse(secret);
-                        if (secretData.token && secretData.token !== '') {
-                            console.log('Token found - redirecting to admin panel');
-                            // Site is configured with token - redirect to admin panel
-                            window.location.replace('cms-core/admin/index.html');
-                            return;
-                        }
-                    } catch (e) {
-                        console.log('Invalid token format:', e);
-                    }
-                }
-                
                 // Check if URL contains cms-core path - if so, go to admin
                 const currentPath = window.location.pathname;
                 if (currentPath.includes('/cms-core/')) {
