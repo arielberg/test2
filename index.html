@@ -127,9 +127,9 @@
                     
                     console.log('URL contains cms-core path - redirecting to admin panel');
                     // Extract base path (everything before /cms-core)
-                    const basePath = currentPath.split('/cms-core')[0] || '';
+                    const adminBasePath = currentPath.split('/cms-core')[0] || '';
                     // Construct admin path
-                    const adminPath = basePath + '/cms-core/admin/index.html';
+                    const adminPath = adminBasePath + '/cms-core/admin/index.html';
                     console.log('Redirecting to:', adminPath);
                     window.location.replace(adminPath);
                     return;
@@ -144,7 +144,7 @@
                     const githubPagesMatch = window.location.href.match(/github\.io\/([^/]+)/);
                     if (githubPagesMatch) {
                         const repoName = githubPagesMatch[1];
-                        const currentPath = window.location.pathname;
+                        // Reuse currentPath from above instead of redeclaring
                         if (currentPath.startsWith(`/${repoName}/`)) {
                             routerPath = `/${repoName}/cms-core/frontend/router.mjs`;
                         }
