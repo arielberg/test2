@@ -44,66 +44,80 @@
     </div>
 
     <script type="module">
-        import { initFrontend } from './cms-core/frontend/router.mjs';
-        
         /**
-         * Check if CMS is configured before rendering site
+         * Check if CMS is configured and redirect accordingly
          */
-        async function checkAndRender() {
+        async function checkAndRedirect() {
             try {
+                console.log('Checking configuration...');
+                
                 // Check site config first (takes precedence), then fall back to cms-core defaults
                 let response = await fetch('config/appSettings.json');
                 if (!response.ok) {
+                    console.log('Site config not found, trying cms-core defaults...');
                     // Fall back to cms-core defaults
                     response = await fetch('cms-core/config/appSettings.json');
                 }
                 
                 if (!response.ok) {
-                    // Not configured - redirect to setup
+                    console.log('No appSettings.json found - redirecting to setup wizard');
+                    // Not configured - redirect to setup wizard
                     window.location.href = 'cms-core/init/index.html';
                     return;
                 }
                 
                 const appSettings = await response.json();
+                console.log('appSettings loaded:', appSettings);
                 
-                // Check if required fields are set
-                if (!appSettings.GIT_Account || 
-                    appSettings.GIT_Account === 'your-username' || 
-                    appSettings.GIT_Account === '') {
-                    // Not configured - redirect to setup
+                // Check if required fields are set (matching setup wizard logic)
+                const hasValidAccount = appSettings.GIT_Account && 
+                    appSettings.GIT_Account !== 'your-username' && 
+                    appSettings.GIT_Account !== '';
+                
+                const hasValidRepo = appSettings.GIT_Repository && 
+                    appSettings.GIT_Repository !== 'your-repo-name' && 
+                    appSettings.GIT_Repository !== '';
+                
+                console.log('hasValidAccount:', hasValidAccount, 'hasValidRepo:', hasValidRepo);
+                
+                if (!hasValidAccount || !hasValidRepo) {
+                    console.log('Invalid account or repository - redirecting to setup wizard');
+                    // Not configured - redirect to setup wizard
                     window.location.href = 'cms-core/init/index.html';
                     return;
                 }
                 
-                if (!appSettings.GIT_Repository || 
-                    appSettings.GIT_Repository === 'your-repo-name' || 
-                    appSettings.GIT_Repository === '') {
-                    // Not configured - redirect to setup
-                    window.location.href = 'cms-core/init/index.html';
-                    return;
+                // Check if token exists in localStorage (optional - user can log in later)
+                const secret = localStorage.getItem('secret');
+                console.log('Secret exists:', !!secret);
+                
+                if (secret) {
+                    try {
+                        const secretData = JSON.parse(secret);
+                        if (secretData.token && secretData.token !== '') {
+                            console.log('Token found - redirecting to admin panel');
+                            // Site is configured with token - redirect to admin panel
+                            window.location.href = 'cms-core/admin/index.html';
+                            return;
+                        }
+                    } catch (e) {
+                        console.log('Invalid token format:', e);
+                    }
                 }
                 
-                // Site is configured - render frontend
-                await initFrontend();
+                // If configured but no token, still allow access to admin (user can log in there)
+                console.log('Configured but no token - redirecting to admin panel (user can log in)');
+                window.location.href = 'cms-core/admin/index.html';
+                
             } catch (error) {
                 console.error('Error checking configuration:', error);
-                // On error, try to render anyway (might work without full config)
-                try {
-                    await initFrontend();
-                } catch (renderError) {
-                    document.body.innerHTML = `
-                        <div style="text-align: center; padding: 40px;">
-                            <h1>Configuration Error</h1>
-                            <p>${error.message}</p>
-                            <a href="cms-core/init/index.html">Go to Setup Wizard</a>
-                        </div>
-                    `;
-                }
+                // On error, redirect to setup wizard
+                window.location.href = 'cms-core/init/index.html';
             }
         }
 
-        // Run check and render on page load
-        checkAndRender();
+        // Run check and redirect on page load
+        checkAndRedirect();
     </script>
 </body>
 </html>
