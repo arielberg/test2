@@ -55,6 +55,36 @@
                 console.log('Checking configuration...');
                 console.log('Current URL:', window.location.href);
                 
+                // Import repository status checker
+                let repoStatus = null;
+                try {
+                    // Get base path for module import
+                    const currentPath = window.location.pathname;
+                    const githubPagesMatch = window.location.href.match(/github\.io\/([^/]+)/);
+                    let modulePath = './cms-core/core/repoStatus.mjs';
+                    if (githubPagesMatch) {
+                        const repoName = githubPagesMatch[1];
+                        if (currentPath.startsWith(`/${repoName}/`)) {
+                            modulePath = `/${repoName}/cms-core/core/repoStatus.mjs`;
+                        }
+                    }
+                    
+                    const repoStatusModule = await import(modulePath);
+                    repoStatus = await repoStatusModule.checkRepositoryStatus('');
+                    console.log('Repository status:', repoStatus);
+                    
+                    // Check if repository initialization is needed
+                    if (repoStatus.needsInitialization) {
+                        console.log('Repository initialization needed - redirecting to setup wizard');
+                        console.log('Missing items:', repoStatus.missingItems);
+                        window.location.replace('cms-core/init/index.html');
+                        return;
+                    }
+                } catch (error) {
+                    console.warn('Could not check repository status:', error);
+                    // Continue with normal config check
+                }
+                
                 // Check site config first (takes precedence), then fall back to cms-core defaults
                 // Add cache-busting parameter to ensure fresh fetch
                 const cacheBuster = '?t=' + Date.now();
@@ -87,7 +117,7 @@
                 const hasValidRepo = appSettings.GIT_Repository && 
                     appSettings.GIT_Repository !== 'your-repo-name' && 
                     appSettings.GIT_Repository !== '';
-                
+
                 console.log('hasValidAccount:', hasValidAccount, 'hasValidRepo:', hasValidRepo);
                 console.log('GIT_Account value:', appSettings.GIT_Account);
                 console.log('GIT_Repository value:', appSettings.GIT_Repository);
