@@ -48,6 +48,34 @@
 
     <script type="module">
         /**
+         * Get the base path for the current site (handles GitHub Pages subpaths)
+         */
+        function getBasePath() {
+            const currentPath = window.location.pathname;
+            const githubPagesMatch = window.location.href.match(/github\.io\/([^/]+)/);
+            if (githubPagesMatch) {
+                const repoName = githubPagesMatch[1];
+                // If pathname starts with /repoName, use /repoName as base
+                // This handles: /js.cms, /js.cms/, /js.cms/index.html, etc.
+                if (currentPath.startsWith(`/${repoName}`)) {
+                    return `/${repoName}`;
+                }
+            }
+            // For local development or root domain, return empty string
+            return '';
+        }
+
+        /**
+         * Construct a path relative to the base path
+         */
+        function getPath(relativePath) {
+            const base = getBasePath();
+            // Remove leading slash from relativePath if present to avoid double slashes
+            const cleanPath = relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
+            return base ? `${base}/${cleanPath}` : cleanPath;
+        }
+
+        /**
          * Check if CMS is configured and redirect accordingly
          */
         async function checkAndRedirect() {
@@ -77,7 +105,7 @@
                     if (repoStatus.needsInitialization) {
                         console.log('Repository initialization needed - redirecting to setup wizard');
                         console.log('Missing items:', repoStatus.missingItems);
-                        window.location.replace('cms-core/init/index.html');
+                        window.location.replace(getPath('cms-core/init/index.html'));
                         return;
                     }
                 } catch (error) {
@@ -102,7 +130,7 @@
                     console.log('No appSettings.json found - redirecting to setup wizard');
                     console.log('Response status:', response.status, response.statusText);
                     // Not configured - redirect to setup wizard
-                    window.location.replace('cms-core/init/index.html');
+                    window.location.replace(getPath('cms-core/init/index.html'));
                     return;
                 }
                 
@@ -137,7 +165,7 @@
                         isEmpty: appSettings.GIT_Repository === ''
                     });
                     // Not configured - redirect to setup wizard
-                    window.location.replace('cms-core/init/index.html');
+                    window.location.replace(getPath('cms-core/init/index.html'));
                     return;
                 }
                 
@@ -196,7 +224,7 @@
                             <p style="color: #666; font-size: 12px;">${error.message || 'Unknown error'}</p>
                             <p style="color: #666; font-size: 11px; margin-top: 10px;">Check browser console (F12) for more details.</p>
                             <div style="margin-top: 30px;">
-                                <a href="cms-core/index.html" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px;">Go to Admin Panel</a>
+                                <a href="${getPath('cms-core/index.html')}" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px;">Go to Admin Panel</a>
                             </div>
                         </div>
                     `;
@@ -213,8 +241,8 @@
                         <p style="color: #666; margin: 20px 0;">An error occurred while checking site configuration.</p>
                         <p style="color: #666; font-size: 12px;">${error.message || 'Unknown error'}</p>
                         <div style="margin-top: 30px;">
-                            <a href="cms-core/init/index.html" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">Setup Wizard</a>
-                            <a href="cms-core/index.html" style="display: inline-block; padding: 10px 20px; background: #48bb78; color: white; text-decoration: none; border-radius: 4px;">Admin Panel</a>
+                            <a href="${getPath('cms-core/init/index.html')}" style="display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">Setup Wizard</a>
+                            <a href="${getPath('cms-core/index.html')}" style="display: inline-block; padding: 10px 20px; background: #48bb78; color: white; text-decoration: none; border-radius: 4px;">Admin Panel</a>
                         </div>
                     </div>
                 `;
