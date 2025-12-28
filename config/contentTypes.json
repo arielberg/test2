@@ -1,15 +1,29 @@
 [
     {
-        "name": "sfsdf",
-        "label": "fgdsfg",
-        "labelPlural": "cdgef",
-        "urlPrefix": "fgsgf/",
+        "name": "page",
+        "label": "Page",
+        "labelPlural": "Pages",
+        "urlPrefix": "",
+        "fixed": true,
         "fields": [
             {
-                "name": "sfdsdf",
-                "label": "sdfsdfsd",
+                "name": "title",
+                "label": "Title",
                 "type": "textfield",
+                "i18n": true,
+                "required": true
+            },
+            {
+                "name": "body",
+                "label": "Body",
+                "type": "wysiwyg",
                 "i18n": true
+            },
+            {
+                "name": "image",
+                "label": "Featured Image",
+                "type": "image",
+                "i18n": false
             }
         ]
     }
